@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <p1>Item: <%= name %> </p1>
+    <br></br>
+    <p1>Initial Price: <%= price %></p1>
+    <br></br> 
+    <img src="<%= image %>", width="400", height="300">
+    <button onclick="retrieveLiveItemData()">is this your Item?</button>
+    <button onclick="abort()">Track another Item</button>
+    <br></br>
+    
+    <p1>Live Item Data:</p1>
+    <p1 id="information"></p1>
+    
+</body>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script>
+let itemLoop; 
+function retrieveLiveItemData(){
+    let output = document.getElementById("information")
+    fetch('/updateInfo').then((data) => {
+        return data.json();
+    }).then((data) => {
+        if ((data.status == "OUT OF STOCK")){
+            output.innerHTML = `Status: ${data.status}, Price: ${data.price}, ${data.time}`;
+        }
+        else{
+            output.innerHTML = `Status: AVAILABLE, Price: ${data.price}, ${data.time}`;
+        }
+    })
+    itemLoop = setInterval(()=> {
+    fetch('/updateInfo').then((data) => {
+        return data.json();
+    }).then((data) => {
+        if ((data.status == "OUT OF STOCK")){
+            output.innerHTML = `Status: ${data.status}, Price: ${data.price}, ${data.time}`;
+        }
+        else{
+            output.innerHTML = `Status: AVAILABLE, Price: ${data.price}, ${data.time}`;
+        }
+    })
+   }, 30000);
+}
+
+function abort(){
+    fetch("/stop")
+    clearInterval(itemLoop);
+    location.href="/";
+    
+}
+
+
+   
+</script>
+
+</html>
